@@ -7,6 +7,8 @@ maintainer: "michael.gale@tweag.io"
 dependencies:
   - base
   - bytestring
+  - flat
+  - mtl
   - plutus-core
   - some
 

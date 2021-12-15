@@ -21,6 +21,7 @@ library
       PlutusCore.Test
       PlutusCore.Test.Constant
       PlutusCore.Test.UPLC
+      PlutusCore.Util
   other-modules:
       Paths_plc_utils
   hs-source-dirs:
@@ -31,6 +32,8 @@ library
   build-depends:
       base
     , bytestring
+    , flat
+    , mtl
     , plutus-core
     , some
   default-language: Haskell2010
