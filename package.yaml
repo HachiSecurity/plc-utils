@@ -1,0 +1,22 @@
+name: plc-utils
+version: 0.1.0.0
+github: "HachiSecurity/plc-utils"
+author: "Michael B. Gale"
+maintainer: "michael.gale@tweag.io"
+
+dependencies:
+  - base
+  - bytestring
+  - plutus-core
+  - some
+
+default-extensions:
+  - ImportQualifiedPost
+
+ghc-options:
+  - -Wall
+  - -Werror=missing-fields
+  - -Werror=missing-methods
+
+library:
+  source-dirs: src

@@ -1,0 +1,4 @@
+resolver: https://raw.githubusercontent.com/HachiSecurity/plutus-resolver/main/lts-17.14.yaml
+
+packages:
+  - .

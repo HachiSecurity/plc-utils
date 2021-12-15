@@ -1,0 +1,8 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "plc-utils:lib"
+
+dependencies:
+  - stack.yaml
+  - package.yaml
