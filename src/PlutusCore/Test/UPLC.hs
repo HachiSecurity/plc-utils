@@ -7,7 +7,9 @@ module PlutusCore.Test.UPLC (
     TestTerm,
     varE,
     lamAbsE,
+    lamAbsManyE,
     applyE,
+    applyManyE,
     constantE,
     builtinE,
     delayE,
@@ -38,11 +40,28 @@ varE = Var ()
 lamAbsE :: Name -> TestTerm -> TestTerm
 lamAbsE = LamAbs ()
 
+-- | `lamAbsManyE` @names body@ constructs @names@-many abstractions which
+-- bind variables named @names@ in order. The inner-most abstraction has
+-- the body given by @body@. For example:
+--
+-- >>> lamAbsManyE [x,y] e
+-- LamAbs () x (LamAbs () y e)
+lamAbsManyE :: [Name] -> TestTerm -> TestTerm
+lamAbsManyE vs b = foldr lamAbsE b vs
+
 -- | `applyE` @funTerm argTerm@ constructs an application of @funTerm@
 -- to @argTerm@.
 infixl 5 `applyE`
 applyE :: TestTerm -> TestTerm -> TestTerm
 applyE = Apply ()
+
+-- | `applyManyE` @funTerm argTerms@ applies @funTerm@ to @argTerms@
+-- through @argTerms@-many applications. For example:
+--
+-- >>> applyManyE f [a,b,c]
+-- Apply () (Apply () (Apply () f a) b) c
+applyManyE :: TestTerm -> [TestTerm] -> TestTerm
+applyManyE = foldl applyE
 
 -- | `constantE` @value@ constructs a constant term for @value@, where the
 -- type of constant is automatically derived from the Haskell type @a@.
