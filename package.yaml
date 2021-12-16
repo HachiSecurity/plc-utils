@@ -1,5 +1,6 @@
 name: plc-utils
 version: 0.1.0.0
+license: MIT
 github: "HachiSecurity/plc-utils"
 author: "Michael B. Gale"
 maintainer: "michael.gale@tweag.io"

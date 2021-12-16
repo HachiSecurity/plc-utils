@@ -10,6 +10,8 @@ homepage:       https://github.com/HachiSecurity/plc-utils#readme
 bug-reports:    https://github.com/HachiSecurity/plc-utils/issues
 author:         Michael B. Gale
 maintainer:     michael.gale@tweag.io
+license:        MIT
+license-file:   LICENSE
 build-type:     Simple
 
 source-repository head
