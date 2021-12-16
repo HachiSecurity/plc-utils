@@ -8,10 +8,12 @@ maintainer: "michael.gale@tweag.io"
 dependencies:
   - base
   - bytestring
+  - data-fix
   - flat
   - mtl
   - plutus-core
   - some
+  - text
 
 default-extensions:
   - ImportQualifiedPost
