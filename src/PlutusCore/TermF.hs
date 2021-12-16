@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveTraversable #-}
 
 -- | Modular representations of the PLC abstract syntax.
 module PlutusCore.TermF (
@@ -44,6 +44,7 @@ data DefaultConstantF r
     | UnitConst
     | ListConst [r]
     | PairConst r r
+    deriving (Eq, Show, Functor, Foldable, Traversable)
 
 type DefaultConstant = Fix DefaultConstantF
 
@@ -84,7 +85,7 @@ data TermF name const ann r
     | Constant !ann !const
     | Builtin !ann !DefaultFun
     | Error !ann
-    deriving (Eq, Show, Functor)
+    deriving (Eq, Show, Functor, Foldable, Traversable)
 
 -------------------------------------------------------------------------------
 
@@ -92,7 +93,7 @@ data TermF name const ann r
 data UntypedF ann r
     = Force !ann !r
     | Delay !ann !r
-    deriving (Eq, Show, Functor)
+    deriving (Eq, Show, Functor, Foldable, Traversable)
 
 -- | Represents terms of Untyped Plutus Core.
 type UntypedTermF name const ann = Sum (TermF name const ann) (UntypedF ann)
@@ -122,7 +123,7 @@ data TypedF tyname ann r
     | TyInst ann r (PLC.Type tyname DefaultUni ann)
     | Unwrap ann r
     | IWrap ann (PLC.Type tyname DefaultUni ann) (PLC.Type tyname DefaultUni ann) r
-    deriving (Show, Functor)
+    deriving (Show, Functor, Foldable, Traversable)
 
 -- | Represents terms of Typed Plutus Core.
 type TypedTermF tyname name const ann =
