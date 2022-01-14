@@ -15,22 +15,28 @@ module PlutusCore.TermF (
     -- | * Typed terms
     TypedF(..),
     TypedTermF,
-    convertPLC
+    convertPLC,
+    -- | * Plutus IR
+    PlutusIRF(..),
+    PlutusIRTermF,
+    convertPIR
 ) where
 
 
 -------------------------------------------------------------------------------
 
 import Data.ByteString (ByteString)
+import Data.List.NonEmpty (NonEmpty)
 import Data.Fix
 import Data.Functor.Sum
 import Data.Text (Text)
+import Data.Proxy
 
 import PlutusCore.Core qualified as PLC
 import PlutusCore.Data (Data)
 import PlutusCore.Default
+import PlutusIR.Core qualified as PIR
 import UntypedPlutusCore qualified as UPLC
-import Data.Proxy
 
 -------------------------------------------------------------------------------
 
@@ -154,5 +160,44 @@ convertPLC (PLC.Unwrap ann term) =
     Fix $ InR $ Unwrap ann (convertPLC term)
 convertPLC (PLC.IWrap ann ty0 ty1 term) =
     Fix $ InR $ IWrap ann ty0 ty1 (convertPLC term)
+
+-------------------------------------------------------------------------------
+
+-- | Represents terms exclusive to PlutusIR.
+data PlutusIRF tyname name ann r
+    = Let ann PIR.Recursivity (NonEmpty (PIR.Binding tyname name DefaultUni DefaultFun ann)) r
+
+-- | Represents terms of PLutusIR.
+type PlutusIRTermF tyname name const ann =
+    Sum (TypedTermF tyname name const ann) (PlutusIRF tyname name ann)
+
+-- | `convertPIR` @term@ converts a PlutusIR @term@ to an equivalent
+-- representation that is the sum of `TypedTermF` and `PlutusIRF`.
+convertPIR
+    :: PIR.Term tyname name DefaultUni DefaultFun ann
+    -> Fix (PlutusIRTermF tyname name DefaultConstant ann)
+convertPIR (PIR.Let ann r b t) = Fix $ InR $ Let ann r b (convertPIR t)
+-- PIR does not just embed the TPLC terms, but instead re-defines them;
+-- there is the `lowerTerm` function in `PlutusIR.Compiler.Lower`, but this
+-- is a hidden module, so we have no good way of just reusing `convertPLC`
+-- here and instead need to re-define it all
+convertPIR (PIR.Var ann name) = Fix $ InL $ InL $ Var (Nothing, ann) name
+convertPIR (PIR.LamAbs ann name ty body) =
+    Fix $ InL $ InL $ LamAbs (Just ty, ann) name (convertPIR body)
+convertPIR (PIR.Apply ann fun arg) =
+    Fix $ InL $ InL $ Apply (Nothing, ann) (convertPIR fun) (convertPIR arg)
+convertPIR (PIR.Builtin ann fun) = Fix $ InL $ InL $ Builtin (Nothing, ann) fun
+convertPIR (PIR.Constant ann (Some (ValueOf tag x))) =
+    Fix $ InL $ InL $ Constant (Nothing, ann) $
+        bring (Proxy :: Proxy Constant) tag (constant x)
+convertPIR (PIR.Error ann ty) = Fix $ InL $ InL $ Error (Just ty, ann)
+convertPIR (PIR.TyAbs ann ty k term) =
+    Fix $ InL $ InR $ TyAbs ann ty k (convertPIR term)
+convertPIR (PIR.TyInst ann term ty) =
+    Fix $ InL $ InR $ TyInst ann (convertPIR term) ty
+convertPIR (PIR.Unwrap ann term) =
+    Fix $ InL $ InR $ Unwrap ann (convertPIR term)
+convertPIR (PIR.IWrap ann ty0 ty1 term) =
+    Fix $ InL $ InR $ IWrap ann ty0 ty1 (convertPIR term)
 
 -------------------------------------------------------------------------------

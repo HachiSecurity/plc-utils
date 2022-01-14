@@ -31,21 +31,24 @@ To generate the documentation for this library, run e.g. `stack haddock`.
 
 ## Modular term representation
 
-The `PlutusCore.TermF` module exports a modular representation of the Plutus Core AST that is divided into three types:
+The `PlutusCore.TermF` module exports a modular representation of the Plutus Core and PlutusIR AST that is divided into the following types:
 
 - `TermF` which represents abstract syntax that is shared between typed and untyped Plutus Core.
 - `UntypedF` which represents abstract syntax that is exclusive to untyped Plutus Core.
 - `TypedF` which represents abstract syntax that is exclusive to typed Plutus Core.
+- `PlutusIRF` which represents abstract syntax that is exclusive to PlutusIR.
 
-The abstract syntax of typed and untyped Plutus Core can then be recovered by taking the sum of these functors. In other words, `Sum (TermF ...) (UntypedF ...)` represents the abstract syntax of untyped Plutus Core. We export two type synonyms:
+The abstract syntax of typed and untyped Plutus Core as well as PlutusIR can then be recovered by taking the sum of these functors. For example, `Sum (TermF ...) (UntypedF ...)` represents the abstract syntax of Untyped Plutus Core. We export the following type synonyms:
 
 - `UntypedTermF` which represents the abstract syntax of untyped Plutus Core.
 - `TypedTermF` which represents the abstract syntax of typed Plutus Core.
+- `PlutusIRTermF` which represents the abstract syntax of PlutusIR.
 
-To convert from the ordinary Plutus Core AST to this module representation, we have the following two functions:
+To convert from the ordinary Plutus Core or PlutusIR AST to this modular representation, we have the following functions:
 
 - `convertUPLC` converts an untyped Plutus Core `Term` to a representation using `UntypedTermF`.
 - `convertPLC` converts a typed Plutus Core `Term` to a representation using `TypedTermF`.
+- `convertPIR` converts a PlutusIR `Term` to a representation using `PlutusIRTermF`.
 
 The modular representation allows us to interweave additional types of nodes into either AST. For example, if we wanted to extend the abstract syntax of untyped Plutus Core with `let`-bindings, we could simply implement the following extension to the abstract syntax:
 
